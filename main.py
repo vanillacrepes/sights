@@ -11,6 +11,7 @@ from vfx.filters import *
 from vfx.filters import *
 from vfx.masks import *
 from state.hand_state import *
+from state.app_state import *
 from config import *
 
 def main():    
@@ -24,8 +25,11 @@ def main():
 
     if not cap.isOpened():
         raise RuntimeError("Could not open webcam")
-
+    
     start_time = time.time()
+    
+    app_state = AppState()
+    setupInput(app_state)
 
     while True:
         ret, frame = cap.read()
@@ -66,69 +70,63 @@ def main():
                     state.save_armed = True
                     state.saved_position = None
 
+
         quad1 = getQuad(hands, (4, 8), (4, 8))
         quad2 = getQuad(hands, (8, 12), (8, 12))
         quad3 = getQuad(hands, (12, 16), (12, 16))
 
 
-
         hex1 = getHex(hands, [4, 12, 20], [4, 12, 20])
-        hex2 = getHex(hands, [4, 12, 20], [4, 12, 20])
-
 
         saved_hand_pos_left = hand_states["Left"].saved_position
-        # hex1 = getTempHex(hands, "Left", saved_hand_pos_left, [4, 12, 20], [4, 12, 20])
 
         mask1 = np.zeros((height, width), dtype=np.uint8)
         mask2 = np.zeros_like(mask1)
         mask3 = np.zeros_like(mask1)
 
         outFrame = frame.copy()
-
-        # if quad1 is not None:
-        #     cv2.fillPoly(mask1 , [quad1], 255)
-
-        #     cv2.polylines(outFrame, [quad1], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
-
-        #     a = applyFilter(frame, ['glass', 'chroma'])
-
-        #     outFrame = applyMask(outFrame, a, mask1)
-
-        # if quad2 is not None:
-        #     cv2.fillPoly(mask2 , [quad2], 255)
-
-        #     cv2.polylines(outFrame, [quad2], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
-
-        #     a = applyFilter(frame, ['rglass', 'chroma'])
-
-        #     outFrame = applyMask(outFrame, a, mask2)
-
-        # if quad3 is not None:
-        #     cv2.fillPoly(mask3 , [quad3], 255)
-
-        #     cv2.polylines(outFrame, [quad3], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
-
-        #     a = applyFilter(frame, ['glass', 'chroma'])
-
-        #     outFrame = applyMask(outFrame, a, mask3)
-
-        # if hex1 is not None:
-        #     cv2.fillPoly(mask1 , [hex1], 255)
-
-        #     cv2.polylines(outFrame, [hex1], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
-
-        #     a = applyFilter(frame, ['glass', 'chroma'])
-
-        #     outFrame = applyMask(outFrame, a, mask1)
         
-        if hex2 is not None:
-            cv2.fillPoly(mask2 , [hex2], 255)
+        if app_state.mode == 1:
 
-            cv2.polylines(outFrame, [hex2], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
+            if quad1 is not None:
+                cv2.fillPoly(mask1 , [quad1], 255)
 
-            a = applyFilter(frame, ['glass', 'chroma'])
+                cv2.polylines(outFrame, [quad1], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
 
-            outFrame = applyMask(outFrame, a, mask2)
+                a = applyFilter(frame, ['glass', 'chroma'])
+
+                outFrame = applyMask(outFrame, a, mask1)
+
+            if quad2 is not None:
+                cv2.fillPoly(mask2 , [quad2], 255)
+
+                cv2.polylines(outFrame, [quad2], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
+
+                a = applyFilter(frame, ['rglass', 'chroma'])
+
+                outFrame = applyMask(outFrame, a, mask2)
+
+            if quad3 is not None:
+                cv2.fillPoly(mask3 , [quad3], 255)
+
+                cv2.polylines(outFrame, [quad3], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
+
+                a = applyFilter(frame, ['glass', 'chroma'])
+
+                outFrame = applyMask(outFrame, a, mask3)
+
+        if app_state.mode == 3:
+            hex1 = getTempHex(hands, "Left", saved_hand_pos_left, [4, 12, 20], [4, 12, 20])
+
+        if app_state.mode == 2 or app_state.mode == 3:
+            if hex1 is not None:
+                cv2.fillPoly(mask1 , [hex1], 255)
+
+                cv2.polylines(outFrame, [hex1], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
+
+                a = applyFilter(frame, ['glass', 'chroma'])
+
+                outFrame = applyMask(outFrame, a, mask1)
 
         
         cv2.imshow("ephemera", outFrame)

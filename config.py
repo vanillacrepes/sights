@@ -1,6 +1,6 @@
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent  # or .parent.parent depending on which file
+BASE_DIR = Path(__file__).parent
 MODEL_PATH = str(BASE_DIR / "mediapipe_tasks" / "hand_landmarker.task")
 
 MIN_DETECTION_CONF = 0.3
