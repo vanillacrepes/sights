@@ -23,6 +23,10 @@ you use your hands as the shape. the app tracks your finger landmarks and maps v
 
 effects chain. `['glass', 'chroma']` runs glass first then chroma on top.
 
+**camera switcher** (hotkey `space`):
+
+- the program will automatically look through your webcams on initialization, press `space` to scroll through them.
+
 ---
 
 ## demo
@@ -31,7 +35,7 @@ uhhh sometime soon
 
 ---
 
-## setup
+## manual setup
 
 **requirements**
 - python 3.10+
@@ -66,12 +70,6 @@ press `ESC` to exit.
 ## config
 
 edit `config.py` to tweak things:
-
-```python
-CAMERA_INDEX = 1          # change depending on what camera you're using
-MIN_DETECTION_CONF = 0.3  # lower = detects hands easier but noisier
-MIN_TRACKING_CONF  = 0.3
-```
 
 ---
 
