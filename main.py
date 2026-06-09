@@ -7,6 +7,7 @@ from mediapipe import Image, ImageFormat
 from hand_tracking.detector import createDetector
 from hand_tracking.tracking import *
 from hand_tracking.gestures import *
+from hand_tracking.camera_switcher import CameraSwitcher
 from vfx.filters import *
 from vfx.filters import *
 from vfx.masks import *
@@ -20,19 +21,16 @@ def main():
     
     # ===SETUP===
     detector = createDetector(MODEL_PATH, MIN_DETECTION_CONF, MIN_PRESENCE_CONF, MIN_TRACKING_CONF)
-
-    cap = cv2.VideoCapture(CAMERA_INDEX)
-
-    if not cap.isOpened():
-        raise RuntimeError("Could not open webcam")
+    
+    camera = CameraSwitcher()
     
     start_time = time.time()
     
     app_state = AppState()
-    setupInput(app_state)
+    app_state.setupInput()
 
     while True:
-        ret, frame = cap.read()
+        ret, frame = camera.read()
         if not ret:
             break
 
@@ -102,7 +100,7 @@ def main():
 
                 cv2.polylines(outFrame, [quad2], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
 
-                a = applyFilter(frame, ['rglass', 'chroma'])
+                a = applyFilter(frame, ['invert'])
 
                 outFrame = applyMask(outFrame, a, mask2)
 
@@ -111,7 +109,7 @@ def main():
 
                 cv2.polylines(outFrame, [quad3], True, (255, 255, 255), 2, lineType=cv2.LINE_AA)
 
-                a = applyFilter(frame, ['glass', 'chroma'])
+                a = applyFilter(frame, ['edge'])
 
                 outFrame = applyMask(outFrame, a, mask3)
 
@@ -134,7 +132,7 @@ def main():
         if cv2.waitKey(1) & 0xFF == 27:  # ESC
             break
 
-    cap.release()
+    camera.release()
     cv2.destroyAllWindows()
     
 if __name__ == "__main__":
