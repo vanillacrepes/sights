@@ -8,6 +8,8 @@ class CameraSwitcher():
   def __init__(self):    
     self.cameras = self.findCameras()
     
+    self.request_switch = False
+    
     self.current_i = 0
     self.cap = cv2.VideoCapture(self.cameras[self.current_i])
     
@@ -22,6 +24,7 @@ class CameraSwitcher():
         
         if ret:
           cameras.append(i)
+          print(i)
           
       cap.release()
       
@@ -41,8 +44,8 @@ class CameraSwitcher():
     time.sleep(0.2)
     
   def setup_camera_hotkey(self):
-    keyboard.add_hotkey('space', lambda: 
-      self.switch_camera()
+    keyboard.add_hotkey('4', lambda: 
+      setattr(self, 'request_switch', True)
     )
     
   def read(self):

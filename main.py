@@ -23,6 +23,7 @@ def main():
     detector = createDetector(MODEL_PATH, MIN_DETECTION_CONF, MIN_PRESENCE_CONF, MIN_TRACKING_CONF)
     
     camera = CameraSwitcher()
+    camera.setup_camera_hotkey()
     
     start_time = time.time()
     
@@ -30,6 +31,10 @@ def main():
     app_state.setupInput()
 
     while True:
+        if camera.request_switch:
+            camera.request_switch = False
+            camera.switch_camera()
+            
         ret, frame = camera.read()
         if not ret:
             break
